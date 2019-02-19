@@ -158,7 +158,13 @@ public enum SqlConformanceEnum implements SqlConformance {
   }
 
   public boolean isSortByAliasObscures() {
-    return this == SqlConformanceEnum.STRICT_92;
+    switch (this) {
+    case STRICT_92:
+    case HIVE:
+      return true;
+    default:
+      return false;
+    }
   }
 
   public boolean isFromRequired() {

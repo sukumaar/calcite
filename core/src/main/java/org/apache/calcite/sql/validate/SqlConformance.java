@@ -146,7 +146,8 @@ public interface SqlConformance {
    * because the alias "x" obscures it.
    *
    * <p>Among the built-in conformance levels, true in
-   * {@link SqlConformanceEnum#STRICT_92};
+   * {@link SqlConformanceEnum#STRICT_92}
+   * {@link SqlConformanceEnum#HIVE}
    * false otherwise.
    */
   boolean isSortByAliasObscures();
