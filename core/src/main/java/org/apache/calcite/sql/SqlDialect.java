@@ -31,6 +31,7 @@ import org.apache.calcite.sql.fun.SqlStdOperatorTable;
 import org.apache.calcite.sql.parser.SqlParserPos;
 import org.apache.calcite.sql.type.BasicSqlType;
 import org.apache.calcite.sql.type.SqlTypeUtil;
+import org.apache.calcite.sql.validate.SqlConformanceEnum;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Suppliers;
@@ -136,6 +137,7 @@ public class SqlDialect {
   private final DatabaseProduct databaseProduct;
   protected final NullCollation nullCollation;
   private final RelDataTypeSystem dataTypeSystem;
+  private final SqlConformanceEnum sqlConformanceEnum;
 
   //~ Constructors -----------------------------------------------------------
 
@@ -192,6 +194,7 @@ public class SqlDialect {
    * @param context All the information necessary to create a dialect
    */
   public SqlDialect(Context context) {
+    this.sqlConformanceEnum = Objects.requireNonNull(context.sqlConformanceEnum());
     this.nullCollation = Objects.requireNonNull(context.nullCollation());
     this.dataTypeSystem = Objects.requireNonNull(context.dataTypeSystem());
     this.databaseProduct =
@@ -218,7 +221,8 @@ public class SqlDialect {
   /** Creates an empty context. Use {@link #EMPTY_CONTEXT} if possible. */
   protected static Context emptyContext() {
     return new ContextImpl(DatabaseProduct.UNKNOWN, null, null, -1, -1, null,
-        NullCollation.HIGH, RelDataTypeSystemImpl.DEFAULT, JethroDataSqlDialect.JethroInfo.EMPTY);
+      NullCollation.HIGH, RelDataTypeSystemImpl.DEFAULT, JethroDataSqlDialect.JethroInfo.EMPTY,
+      SqlConformanceEnum.DEFAULT);
   }
 
   /**
@@ -852,18 +856,17 @@ public class SqlDialect {
     return true;
   }
 
-  /**
-   * Returns whether the dialect supports column alias in sorting, for instance
-   * {@code SELECT SKU+1 AS A FROM "PRODUCT" ORDER BY A }.
-   */
-  public boolean supportsColumnAliasInSort() {
-    return false;
-  }
-
   /** Returns how NULL values are sorted if an ORDER BY item does not contain
    * NULLS ASCENDING or NULLS DESCENDING. */
   public NullCollation getNullCollation() {
     return nullCollation;
+  }
+
+  /**
+   * Returns SqlConformanceEnum for current SqlDialect
+   */
+  public SqlConformanceEnum getSqlConformanceEnum() {
+    return this.sqlConformanceEnum;
   }
 
   /** Returns whether NULL values are sorted first or last, in this dialect,
@@ -1068,6 +1071,8 @@ public class SqlDialect {
     Context withDataTypeSystem(@Nonnull RelDataTypeSystem dataTypeSystem);
     JethroDataSqlDialect.JethroInfo jethroInfo();
     Context withJethroInfo(JethroDataSqlDialect.JethroInfo jethroInfo);
+    @Nonnull SqlConformanceEnum sqlConformanceEnum();
+    Context withSqlConformanceEnum(@Nonnull SqlConformanceEnum sqlConformanceEnum);
   }
 
   /** Implementation of Context. */
@@ -1081,13 +1086,15 @@ public class SqlDialect {
     private final NullCollation nullCollation;
     private final RelDataTypeSystem dataTypeSystem;
     private final JethroDataSqlDialect.JethroInfo jethroInfo;
+    private final SqlConformanceEnum sqlConformanceEnum;
 
     private ContextImpl(DatabaseProduct databaseProduct,
         String databaseProductName, String databaseVersion,
         int databaseMajorVersion, int databaseMinorVersion,
         String identifierQuoteString, NullCollation nullCollation,
         RelDataTypeSystem dataTypeSystem,
-        JethroDataSqlDialect.JethroInfo jethroInfo) {
+        JethroDataSqlDialect.JethroInfo jethroInfo,
+        SqlConformanceEnum sqlConformanceEnum) {
       this.databaseProduct = Objects.requireNonNull(databaseProduct);
       this.databaseProductName = databaseProductName;
       this.databaseVersion = databaseVersion;
@@ -1097,6 +1104,7 @@ public class SqlDialect {
       this.nullCollation = Objects.requireNonNull(nullCollation);
       this.dataTypeSystem = Objects.requireNonNull(dataTypeSystem);
       this.jethroInfo = Objects.requireNonNull(jethroInfo);
+      this.sqlConformanceEnum = Objects.requireNonNull(sqlConformanceEnum);
     }
 
     @Nonnull public DatabaseProduct databaseProduct() {
@@ -1106,8 +1114,8 @@ public class SqlDialect {
     public Context withDatabaseProduct(
         @Nonnull DatabaseProduct databaseProduct) {
       return new ContextImpl(databaseProduct, databaseProductName,
-          databaseVersion, databaseMajorVersion, databaseMinorVersion,
-          identifierQuoteString, nullCollation, dataTypeSystem, jethroInfo);
+        databaseVersion, databaseMajorVersion, databaseMinorVersion,
+        identifierQuoteString, nullCollation, dataTypeSystem, jethroInfo, sqlConformanceEnum);
     }
 
     public String databaseProductName() {
@@ -1116,8 +1124,8 @@ public class SqlDialect {
 
     public Context withDatabaseProductName(String databaseProductName) {
       return new ContextImpl(databaseProduct, databaseProductName,
-          databaseVersion, databaseMajorVersion, databaseMinorVersion,
-          identifierQuoteString, nullCollation, dataTypeSystem, jethroInfo);
+        databaseVersion, databaseMajorVersion, databaseMinorVersion,
+        identifierQuoteString, nullCollation, dataTypeSystem, jethroInfo, sqlConformanceEnum);
     }
 
     public String databaseVersion() {
@@ -1126,8 +1134,8 @@ public class SqlDialect {
 
     public Context withDatabaseVersion(String databaseVersion) {
       return new ContextImpl(databaseProduct, databaseProductName,
-          databaseVersion, databaseMajorVersion, databaseMinorVersion,
-          identifierQuoteString, nullCollation, dataTypeSystem, jethroInfo);
+        databaseVersion, databaseMajorVersion, databaseMinorVersion,
+        identifierQuoteString, nullCollation, dataTypeSystem, jethroInfo, sqlConformanceEnum);
     }
 
     public int databaseMajorVersion() {
@@ -1136,8 +1144,8 @@ public class SqlDialect {
 
     public Context withDatabaseMajorVersion(int databaseMajorVersion) {
       return new ContextImpl(databaseProduct, databaseProductName,
-          databaseVersion, databaseMajorVersion, databaseMinorVersion,
-          identifierQuoteString, nullCollation, dataTypeSystem, jethroInfo);
+        databaseVersion, databaseMajorVersion, databaseMinorVersion,
+        identifierQuoteString, nullCollation, dataTypeSystem, jethroInfo, sqlConformanceEnum);
     }
 
     public int databaseMinorVersion() {
@@ -1146,8 +1154,8 @@ public class SqlDialect {
 
     public Context withDatabaseMinorVersion(int databaseMinorVersion) {
       return new ContextImpl(databaseProduct, databaseProductName,
-          databaseVersion, databaseMajorVersion, databaseMinorVersion,
-          identifierQuoteString, nullCollation, dataTypeSystem, jethroInfo);
+        databaseVersion, databaseMajorVersion, databaseMinorVersion,
+        identifierQuoteString, nullCollation, dataTypeSystem, jethroInfo, sqlConformanceEnum);
     }
 
     public String identifierQuoteString() {
@@ -1156,8 +1164,8 @@ public class SqlDialect {
 
     public Context withIdentifierQuoteString(String identifierQuoteString) {
       return new ContextImpl(databaseProduct, databaseProductName,
-          databaseVersion, databaseMajorVersion, databaseMinorVersion,
-          identifierQuoteString, nullCollation, dataTypeSystem, jethroInfo);
+        databaseVersion, databaseMajorVersion, databaseMinorVersion,
+        identifierQuoteString, nullCollation, dataTypeSystem, jethroInfo, sqlConformanceEnum);
     }
 
     @Nonnull public NullCollation nullCollation() {
@@ -1166,8 +1174,8 @@ public class SqlDialect {
 
     public Context withNullCollation(@Nonnull NullCollation nullCollation) {
       return new ContextImpl(databaseProduct, databaseProductName,
-          databaseVersion, databaseMajorVersion, databaseMinorVersion,
-          identifierQuoteString, nullCollation, dataTypeSystem, jethroInfo);
+        databaseVersion, databaseMajorVersion, databaseMinorVersion,
+        identifierQuoteString, nullCollation, dataTypeSystem, jethroInfo, sqlConformanceEnum);
     }
 
     @Nonnull public RelDataTypeSystem dataTypeSystem() {
@@ -1176,8 +1184,8 @@ public class SqlDialect {
 
     public Context withDataTypeSystem(@Nonnull RelDataTypeSystem dataTypeSystem) {
       return new ContextImpl(databaseProduct, databaseProductName,
-          databaseVersion, databaseMajorVersion, databaseMinorVersion,
-          identifierQuoteString, nullCollation, dataTypeSystem, jethroInfo);
+        databaseVersion, databaseMajorVersion, databaseMinorVersion,
+        identifierQuoteString, nullCollation, dataTypeSystem, jethroInfo, sqlConformanceEnum);
     }
 
     @Nonnull public JethroDataSqlDialect.JethroInfo jethroInfo() {
@@ -1186,8 +1194,18 @@ public class SqlDialect {
 
     public Context withJethroInfo(JethroDataSqlDialect.JethroInfo jethroInfo) {
       return new ContextImpl(databaseProduct, databaseProductName,
-          databaseVersion, databaseMajorVersion, databaseMinorVersion,
-          identifierQuoteString, nullCollation, dataTypeSystem, jethroInfo);
+        databaseVersion, databaseMajorVersion, databaseMinorVersion,
+        identifierQuoteString, nullCollation, dataTypeSystem, jethroInfo, sqlConformanceEnum);
+    }
+
+    public Context withSqlConformanceEnum(@Nonnull SqlConformanceEnum sqlConformanceEnum) {
+      return new ContextImpl(databaseProduct, databaseProductName,
+        databaseVersion, databaseMajorVersion, databaseMinorVersion,
+        identifierQuoteString, nullCollation, dataTypeSystem, jethroInfo, sqlConformanceEnum);
+    }
+
+    @Nonnull public SqlConformanceEnum sqlConformanceEnum() {
+      return sqlConformanceEnum;
     }
   }
 }

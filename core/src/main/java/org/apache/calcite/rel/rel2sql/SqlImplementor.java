@@ -1046,12 +1046,10 @@ public abstract class SqlImplementor {
           && hasNestedAggregations((LogicalAggregate) rel)) {
         needNew = true;
       }
-
       if (rel instanceof LogicalSort
-          && dialect.supportsColumnAliasInSort()) {
+          && dialect.getSqlConformanceEnum().isSortByAlias()) {
         keepColumnAlias = true;
       }
-
       SqlSelect select;
       Expressions.FluentList<Clause> clauseList = Expressions.list();
       if (needNew) {

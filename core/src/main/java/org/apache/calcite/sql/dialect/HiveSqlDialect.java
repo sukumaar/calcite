@@ -24,6 +24,7 @@ import org.apache.calcite.sql.SqlOperator;
 import org.apache.calcite.sql.SqlSyntax;
 import org.apache.calcite.sql.SqlWriter;
 import org.apache.calcite.sql.fun.SqlStdOperatorTable;
+import org.apache.calcite.sql.validate.SqlConformanceEnum;
 
 /**
  * A <code>SqlDialect</code> implementation for the Apache Hive database.
@@ -32,7 +33,8 @@ public class HiveSqlDialect extends SqlDialect {
   public static final SqlDialect DEFAULT =
       new HiveSqlDialect(EMPTY_CONTEXT
           .withDatabaseProduct(DatabaseProduct.HIVE)
-          .withNullCollation(NullCollation.LOW));
+          .withNullCollation(NullCollation.LOW)
+          .withSqlConformanceEnum(SqlConformanceEnum.HIVE));
 
   private final boolean emulateNullDirection;
 
@@ -48,10 +50,6 @@ public class HiveSqlDialect extends SqlDialect {
 
   @Override protected boolean allowsAs() {
     return false;
-  }
-
-  @Override public boolean supportsColumnAliasInSort() {
-    return true;
   }
 
   @Override public void unparseOffsetFetch(SqlWriter writer, SqlNode offset,
