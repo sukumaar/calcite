@@ -31,6 +31,7 @@ import org.apache.calcite.sql.fun.SqlStdOperatorTable;
 import org.apache.calcite.sql.parser.SqlParserPos;
 import org.apache.calcite.sql.type.BasicSqlType;
 import org.apache.calcite.sql.type.SqlTypeUtil;
+import org.apache.calcite.sql.validate.SqlConformance;
 import org.apache.calcite.sql.validate.SqlConformanceEnum;
 
 import com.google.common.base.Preconditions;
@@ -137,7 +138,7 @@ public class SqlDialect {
   private final DatabaseProduct databaseProduct;
   protected final NullCollation nullCollation;
   private final RelDataTypeSystem dataTypeSystem;
-  private final SqlConformanceEnum sqlConformanceEnum;
+  private final SqlConformance sqlConformance;
 
   //~ Constructors -----------------------------------------------------------
 
@@ -194,7 +195,7 @@ public class SqlDialect {
    * @param context All the information necessary to create a dialect
    */
   public SqlDialect(Context context) {
-    this.sqlConformanceEnum = Objects.requireNonNull(context.sqlConformanceEnum());
+    this.sqlConformance = Objects.requireNonNull(context.sqlConformance());
     this.nullCollation = Objects.requireNonNull(context.nullCollation());
     this.dataTypeSystem = Objects.requireNonNull(context.dataTypeSystem());
     this.databaseProduct =
@@ -863,10 +864,10 @@ public class SqlDialect {
   }
 
   /**
-   * Returns SqlConformanceEnum for current SqlDialect
+   * Returns SqlConformance for current SqlDialect
    */
-  public SqlConformanceEnum getSqlConformanceEnum() {
-    return this.sqlConformanceEnum;
+  public SqlConformance getSqlConformance() {
+    return this.sqlConformance;
   }
 
   /** Returns whether NULL values are sorted first or last, in this dialect,
@@ -1071,8 +1072,8 @@ public class SqlDialect {
     Context withDataTypeSystem(@Nonnull RelDataTypeSystem dataTypeSystem);
     JethroDataSqlDialect.JethroInfo jethroInfo();
     Context withJethroInfo(JethroDataSqlDialect.JethroInfo jethroInfo);
-    @Nonnull SqlConformanceEnum sqlConformanceEnum();
-    Context withSqlConformanceEnum(@Nonnull SqlConformanceEnum sqlConformanceEnum);
+    @Nonnull SqlConformance sqlConformance();
+    Context withSqlConformance(@Nonnull SqlConformance sqlConformanceEnum);
   }
 
   /** Implementation of Context. */
@@ -1086,7 +1087,7 @@ public class SqlDialect {
     private final NullCollation nullCollation;
     private final RelDataTypeSystem dataTypeSystem;
     private final JethroDataSqlDialect.JethroInfo jethroInfo;
-    private final SqlConformanceEnum sqlConformanceEnum;
+    private final SqlConformance sqlConformanceEnum;
 
     private ContextImpl(DatabaseProduct databaseProduct,
         String databaseProductName, String databaseVersion,
@@ -1094,7 +1095,7 @@ public class SqlDialect {
         String identifierQuoteString, NullCollation nullCollation,
         RelDataTypeSystem dataTypeSystem,
         JethroDataSqlDialect.JethroInfo jethroInfo,
-        SqlConformanceEnum sqlConformanceEnum) {
+        SqlConformance sqlConformanceEnum) {
       this.databaseProduct = Objects.requireNonNull(databaseProduct);
       this.databaseProductName = databaseProductName;
       this.databaseVersion = databaseVersion;
@@ -1198,13 +1199,13 @@ public class SqlDialect {
         identifierQuoteString, nullCollation, dataTypeSystem, jethroInfo, sqlConformanceEnum);
     }
 
-    public Context withSqlConformanceEnum(@Nonnull SqlConformanceEnum sqlConformanceEnum) {
+    public Context withSqlConformance(@Nonnull SqlConformance sqlConformanceEnum) {
       return new ContextImpl(databaseProduct, databaseProductName,
         databaseVersion, databaseMajorVersion, databaseMinorVersion,
         identifierQuoteString, nullCollation, dataTypeSystem, jethroInfo, sqlConformanceEnum);
     }
 
-    @Nonnull public SqlConformanceEnum sqlConformanceEnum() {
+    @Nonnull public SqlConformance sqlConformance() {
       return sqlConformanceEnum;
     }
   }

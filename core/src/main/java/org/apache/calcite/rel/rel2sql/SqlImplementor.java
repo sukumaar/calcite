@@ -1047,7 +1047,7 @@ public abstract class SqlImplementor {
         needNew = true;
       }
       if (rel instanceof LogicalSort
-          && dialect.getSqlConformanceEnum().isSortByAlias()) {
+          && dialect.getSqlConformance().isSortByAlias()) {
         keepColumnAlias = true;
       }
       SqlSelect select;
