@@ -554,6 +554,15 @@ public class SqlDialect {
     return true;
   }
 
+  /**Setting hasDualTable as false by default ,
+  *because most of the dialects supports SELECT without FROM clause .
+   */
+  public boolean hasDualTable() {
+    return false; }
+
+  public boolean supportCommaForCrossJoin() {
+    return true; }
+
   // -- behaviors --
   protected boolean requiresAliasForFromItems() {
     return false;
@@ -857,6 +866,14 @@ public class SqlDialect {
     return true;
   }
 
+  /**
+   * Returns whether the dialect supports column alias in sorting, for instance
+   * {@code SELECT SKU+1 AS A FROM "PRODUCT" ORDER BY A }.
+   */
+  public boolean supportsColumnAliasInSort() {
+    return false;
+  }
+
   /** Returns how NULL values are sorted if an ORDER BY item does not contain
    * NULLS ASCENDING or NULLS DESCENDING. */
   public NullCollation getNullCollation() {
@@ -998,6 +1015,7 @@ public class SqlDialect {
     HSQLDB("Hsqldb", null, NullCollation.HIGH),
     VERTICA("Vertica", "\"", NullCollation.HIGH),
     SQLSTREAM("SQLstream", "\"", NullCollation.HIGH),
+    SPARK("Spark", null, NullCollation.LOW),
 
     /** Paraccel, now called Actian Matrix. Redshift is based on this, so
      * presumably the dialect capabilities are similar. */
