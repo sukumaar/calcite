@@ -146,26 +146,30 @@ public class RelToSqlConverterTest {
     final String query = "select sku+1 as a from \"product\" order by a";
     final String bigQueryExpected = "SELECT SKU + 1 AS A\nFROM foodmart.product\n"
         + "ORDER BY A IS NULL, A";
-    final String hiveExpected = "SELECT SKU + 1 A\nFROM foodmart.product\n"
+    final String expected = "SELECT SKU + 1 A\nFROM foodmart.product\n"
         + "ORDER BY A IS NULL, A";
     sql(query)
         .withBigquery()
         .ok(bigQueryExpected)
         .withHive()
-        .ok(hiveExpected);
+        .ok(expected)
+        .withSpark()
+        .ok(expected);
   }
 
   @Test public void testSimpleSelectWithOrderByAliasDesc() {
     final String query = "select sku+1 as a from \"product\" order by a desc";
     final String bigQueryExpected = "SELECT SKU + 1 AS A\nFROM foodmart.product\n"
         + "ORDER BY A IS NULL DESC, A DESC";
-    final String hiveExpected = "SELECT SKU + 1 A\nFROM foodmart.product\n"
+    final String expected = "SELECT SKU + 1 A\nFROM foodmart.product\n"
         + "ORDER BY A IS NULL DESC, A DESC";
     sql(query)
         .withBigquery()
         .ok(bigQueryExpected)
         .withHive()
-        .ok(hiveExpected);
+        .ok(expected)
+        .withSpark()
+        .ok(expected);
   }
 
   @Test public void testSimpleSelectStarFromProductTable() {

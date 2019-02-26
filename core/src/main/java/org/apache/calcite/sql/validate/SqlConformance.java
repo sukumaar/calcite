@@ -134,9 +134,10 @@ public interface SqlConformance {
    * {@link SqlConformanceEnum#ORACLE_10},
    * {@link SqlConformanceEnum#ORACLE_12},
    * {@link SqlConformanceEnum#STRICT_92},
-   * {@link SqlConformanceEnum#SQL_SERVER_2008};
-   * {@link SqlConformanceEnum#BIG_QUERY};
-   * {@link SqlConformanceEnum#HIVE};
+   * {@link SqlConformanceEnum#SQL_SERVER_2008},
+   * {@link SqlConformanceEnum#BIG_QUERY},
+   * {@link SqlConformanceEnum#HIVE},
+   * {@link SqlConformanceEnum#SPARK_SQL};
    * false otherwise.
    */
   boolean isSortByAlias();

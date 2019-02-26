@@ -21,6 +21,7 @@ import org.apache.calcite.sql.JoinType;
 import org.apache.calcite.sql.SqlDialect;
 import org.apache.calcite.sql.SqlNode;
 import org.apache.calcite.sql.SqlWriter;
+import org.apache.calcite.sql.validate.SqlConformanceEnum;
 
 /**
  * A <code>SqlDialect</code> implementation for the APACHE SPARK database.
@@ -29,7 +30,8 @@ public class SparkSqlDialect extends SqlDialect {
   public static final SqlDialect DEFAULT =
       new SparkSqlDialect(EMPTY_CONTEXT
           .withDatabaseProduct(DatabaseProduct.SPARK)
-          .withNullCollation(NullCollation.LOW));
+          .withNullCollation(NullCollation.LOW)
+          .withSqlConformance(SqlConformanceEnum.HIVE));
 
   /**
    * Creates a SparkSqlDialect.

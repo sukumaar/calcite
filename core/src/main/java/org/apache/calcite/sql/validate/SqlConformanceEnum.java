@@ -77,7 +77,11 @@ public enum SqlConformanceEnum implements SqlConformance {
 
   /** Conformance value that instructs Calcite to use SQL semantics
    * consistent with Apache Hive. */
-  HIVE;
+  HIVE,
+
+  /** Conformance value that instructs Calcite to use SQL semantics
+   * consistent with Apache Spark SQL. */
+  SPARK_SQL;
 
   public boolean isLiberal() {
     switch (this) {
@@ -151,6 +155,7 @@ public enum SqlConformanceEnum implements SqlConformance {
     case SQL_SERVER_2008:
     case HIVE:
     case BIG_QUERY:
+    case SPARK_SQL:
       return true;
     default:
       return false;
