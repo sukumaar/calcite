@@ -146,30 +146,34 @@ public class RelToSqlConverterTest {
     final String query = "select sku+1 as a from \"product\" order by a";
     final String bigQueryExpected = "SELECT SKU + 1 AS A\nFROM foodmart.product\n"
         + "ORDER BY A IS NULL, A";
-    final String expected = "SELECT SKU + 1 A\nFROM foodmart.product\n"
+    final String hiveExpected = "SELECT SKU + 1 A\nFROM foodmart.product\n"
         + "ORDER BY A IS NULL, A";
+    final String sparkSqlExpected = "SELECT SKU + 1 A\nFROM foodmart.product\n"
+        + "ORDER BY A NULLS LAST";
     sql(query)
         .withBigquery()
         .ok(bigQueryExpected)
         .withHive()
-        .ok(expected)
+        .ok(hiveExpected)
         .withSpark()
-        .ok(expected);
+        .ok(sparkSqlExpected);
   }
 
   @Test public void testSimpleSelectWithOrderByAliasDesc() {
     final String query = "select sku+1 as a from \"product\" order by a desc";
     final String bigQueryExpected = "SELECT SKU + 1 AS A\nFROM foodmart.product\n"
         + "ORDER BY A IS NULL DESC, A DESC";
-    final String expected = "SELECT SKU + 1 A\nFROM foodmart.product\n"
+    final String hiveExpected = "SELECT SKU + 1 A\nFROM foodmart.product\n"
         + "ORDER BY A IS NULL DESC, A DESC";
+    final String sparkSqlExpected = "SELECT SKU + 1 A\nFROM foodmart.product\n"
+        + "ORDER BY A DESC NULLS FIRST";
     sql(query)
         .withBigquery()
         .ok(bigQueryExpected)
         .withHive()
-        .ok(expected)
+        .ok(hiveExpected)
         .withSpark()
-        .ok(expected);
+        .ok(sparkSqlExpected);
   }
 
   @Test public void testSimpleSelectStarFromProductTable() {
