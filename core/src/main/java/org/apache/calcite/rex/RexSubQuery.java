@@ -102,7 +102,7 @@ public class RexSubQuery extends RexCall {
     assert fieldList.size() == 1;
     final RelDataTypeFactory typeFactory = rel.getCluster().getTypeFactory();
     final RelDataType type =
-        typeFactory.createTypeWithNullability(fieldList.get(0).getType(), true);
+        typeFactory.copyType(fieldList.get(0).getType());
     return new RexSubQuery(type, SqlStdOperatorTable.SCALAR_QUERY,
         ImmutableList.of(), rel);
   }
